@@ -112,7 +112,8 @@ function Model_run(N,r,w_initial,b_initial)
     h = 2/param_node.Q
     k = 1/param_node.N
     x = (-1 .+ (1:param_node.Q) .* h .- h / 2)'
-    y_exact = x + (1 .-x.^2)./3
+    #y_exact = x + (1 .-x.^2)./3
+    y_exact = x.^5 .+ 1/3 * x.^2
     L, L_main, dLda, dLdc, dLdw, dLdb = grad(param_node,x,y_exact,theta_node)
     tol = param_node.tol
     resid = 2*tol
@@ -125,6 +126,6 @@ function Model_run(N,r,w_initial,b_initial)
         end
         resid = maximum(abs.([dLdw; dLdb]))
     end
-    print("Resid = $resid")
+    println(" Reg = $r "," Resid = $resid ", " Loss = $L_main ")
     return theta_node.w, theta_node.b
 end
