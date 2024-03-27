@@ -90,7 +90,7 @@ end
 
 @kwdef mutable struct param
     N::Integer = 16
-    Q::Integer = 64
+    Q::Integer = 128
     r::Float64 = 0
     tol::Float64 = 1e-5
     dt::Float64 = 1e-1
@@ -104,6 +104,10 @@ end
     c::Float64
 end
 
+# This is the Main function for the model to Train
+# Input: N, r, First w, First b
+# Output: The best w, The best b and the loss
+
 function Model_run(N,r,w_initial,b_initial)
     param_node = param()
     param_node.r = r
@@ -112,8 +116,8 @@ function Model_run(N,r,w_initial,b_initial)
     h = 2/param_node.Q
     k = 1/param_node.N
     x = (-1 .+ (1:param_node.Q) .* h .- h / 2)'
-    #y_exact = x + (1 .-x.^2)./3
-    y_exact = x.^5 .+ 1/3 * x.^2
+    y_exact = x + (1 .-x.^2)./3
+    #y_exact = x + (1 .+ x.^2)./3
     L, L_main, dLda, dLdc, dLdw, dLdb = grad(param_node,x,y_exact,theta_node)
     tol = param_node.tol
     resid = 2*tol
@@ -127,5 +131,5 @@ function Model_run(N,r,w_initial,b_initial)
         resid = maximum(abs.([dLdw; dLdb]))
     end
     println(" Reg = $r "," Resid = $resid ", " Loss = $L_main ")
-    return theta_node.w, theta_node.b
+    return theta_node.w, theta_node.b, L_main
 end
